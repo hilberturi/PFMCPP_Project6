@@ -67,7 +67,7 @@ struct TPtrComparator                                //4
 {
     T* compare(T* a, T* b) //5
     {
-        // I will enforce safe pointer usage here according to 13)
+        // I will enforce safe pointer usage here as directed by 13)
         if (a == nullptr || b == nullptr)
         {
             return nullptr;
@@ -81,29 +81,30 @@ struct TPtrComparator                                //4
 
 struct U
 {
-    float <#name1#> { 0 }, <#name2#> { 0 };
-    <#returnType#> <#memberFunction#>(<#type name#>* <#updatedValue#>)      //12
+    float exactTargetValue { 0 }, adjustedValue { 0 };
+    float updateValuesAndMultiply(float* updatedValue)      //12
     {
-        
+        // TODO: replace by actual implementation #############
+        return 0;
     }
 };
 
-struct <#structname2#>
+struct UValueUpdater
 {
-    static <#returntype#> <#staticFunctionA#>(U* that, <#type name#>* <#updatedValue#> )        //10
+    static float updateValuesAndMultiply(U* that, float* updatedValue )        //10
     {
-        std::cout << "U's <#name1#> value: " << that-><#name1#> << std::endl;
-        that-><#name1#> = <#updatedValue#>;
-        std::cout << "U's <#name1#> updated value: " << that-><#name1#> << std::endl;
-        while( std::abs(that-><#name2#> - that-><#name1#>) > 0.001f )
+        std::cout << "U's exactTargetValue value: " << that->exactTargetValue << std::endl;
+        that->exactTargetValue = *updatedValue; // I had to add * here in addition to substituting the placeholder
+        std::cout << "U's exactTargetValue updated value: " << that->exactTargetValue << std::endl;
+        while( std::abs(that->adjustedValue - that->exactTargetValue) > 0.001f )
         {
             /*
-             write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
+             write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
              */
-            that-><#name2#> += ;
+            that->adjustedValue += ; // TODO#####################
         }
-        std::cout << "U's <#name2#> updated value: " << that-><#name2#> << std::endl;
-        return that-><#name2#> * that-><#name1#>;
+        std::cout << "U's adjustedValue updated value: " << that->adjustedValue << std::endl;
+        return that->adjustedValue * that->exactTargetValue;
     }
 };
         
@@ -138,10 +139,10 @@ int main()
                   << std::endl;
     }
     
-    U <#name3#>;
+    U u1;
     float updatedValue = 5.f;
-    std::cout << "[static func] <#name3#>'s multiplied values: " << <#structname2#>::<#staticFunctionA#>( , ) << std::endl;                  //11
+    std::cout << "[static func] u1's multiplied values: " << UValueUpdater::updateValuesAndMultiply( &u1, &updatedValue) << std::endl;                  //11
     
-    U <#name4#>;
-    std::cout << "[member func] <#name4#>'s multiplied values: " << <#name4#>.<#memberFunction#>( &updatedValue ) << std::endl;
+    U u2;
+    std::cout << "[member func] u2's multiplied values: " << u2.updateValuesAndMultiply( &updatedValue ) << std::endl;
 }
