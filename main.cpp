@@ -58,17 +58,23 @@ Purpose:  This project will show you the difference between member functions and
 #include <string>
 struct T
 {
-    T(<#type name#> v, const char* <#variable name#>)   //1
-    //2
-    //3
+    T(int v, const char* theName) : value(v), name(theName) {}  //1 Note that I had to change the <#type name#> of the first arg to int rather than T*
+    int value; //2
+    std::string name; //3
 };
 
-struct <#structName1#>                                //4
+struct TPtrComparator                                //4
 {
-    <#type name#> compare(<#type name#> a, <#type name#> b) //5
+    T* compare(T* a, T* b) //5
     {
+        // I will enforce safe pointer usage here according to 13)
+        if (a == nullptr || b == nullptr)
+        {
+            return nullptr;
+        }
         if( a->value < b->value ) return a;
         if( a->value > b->value ) return b;
+        // both values are equal
         return nullptr;
     }
 };
@@ -117,12 +123,20 @@ struct <#structname2#>
 
 int main()
 {
-    T <#name1#>( , );                                             //6
-    T <#name2#>( , );                                             //6
+    T t1(1 , "name1");                                             //6
+    T t2(2 , "name2");                                             //6
     
-    <#structName1#> f;                                            //7
-    auto* smaller = f.compare( , );                              //8
-    std::cout << "the smaller one is << " << smaller->name << std::endl; //9
+    TPtrComparator f;                                            //7
+    auto* smaller = f.compare( &t1, &t2);                              //8
+    if (smaller != nullptr)
+    {
+        std::cout << "the smaller one is << " << smaller->name << std::endl; //9    
+    }
+    else 
+    {
+        std::cout << "'f.compare()' returned nullptr (one arg is nullptr, or both args have same value)"
+                  << std::endl;
+    }
     
     U <#name3#>;
     float updatedValue = 5.f;
