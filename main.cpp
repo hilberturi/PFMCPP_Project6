@@ -68,13 +68,11 @@ struct TPtrComparator                                //4
     T* compare(T* a, T* b) //5
     {
         // I will enforce safe pointer usage here as directed by 13)
-        if (a == nullptr || b == nullptr)
+        if (a != nullptr && b != nullptr)
         {
-            return nullptr;
+            if( a->value < b->value ) return a;
+            if( a->value > b->value ) return b;
         }
-        if( a->value < b->value ) return a;
-        if( a->value > b->value ) return b;
-        // both values are equal
         return nullptr;
     }
 };
@@ -93,19 +91,21 @@ struct U
         if (updatedValue == nullptr)
         {
             std::cout << "U::updateValuesAndMultiply(): cannot update for nullptr" << std::endl;
-            return adjustedValue * exactTargetValue;
         }
-        std::cout << "U's exactTargetValue value: " << exactTargetValue << std::endl;
-        exactTargetValue = *updatedValue;
-        std::cout << "U's exactTargetValue updated value: " << exactTargetValue << std::endl;
-        while( std::abs(adjustedValue - exactTargetValue) > 0.001f )
+        else
         {
-            /*
-             write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
-             */
-            adjustedValue += 0.5f * (exactTargetValue - adjustedValue);
-        }
-        std::cout << "U's adjustedValue updated value: " << adjustedValue << std::endl;
+            std::cout << "U's exactTargetValue value: " << exactTargetValue << std::endl;
+            exactTargetValue = *updatedValue;
+            std::cout << "U's exactTargetValue updated value: " << exactTargetValue << std::endl;
+            while( std::abs(adjustedValue - exactTargetValue) > 0.001f )
+            {
+                /*
+                 write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
+                 */
+                adjustedValue += 0.5f * (exactTargetValue - adjustedValue);
+            }
+            std::cout << "U's adjustedValue updated value: " << adjustedValue << std::endl;
+            }
         return adjustedValue * exactTargetValue;
     }
 };
@@ -125,20 +125,21 @@ struct UValueUpdater
         if (updatedValue == nullptr)
         {
             std::cout << "U::updateValuesAndMultiply(): cannot update for nullptr" << std::endl;
-            return that->adjustedValue * that->exactTargetValue;
         }
-
-        std::cout << "U's exactTargetValue value: " << that->exactTargetValue << std::endl;
-        that->exactTargetValue = *updatedValue; // I had to add * here in addition to substituting the placeholder
-        std::cout << "U's exactTargetValue updated value: " << that->exactTargetValue << std::endl;
-        while( std::abs(that->adjustedValue - that->exactTargetValue) > 0.001f )
+        else 
         {
-            /*
-             write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
-             */
-            that->adjustedValue += 0.5f * (that->exactTargetValue - that->adjustedValue);
+            std::cout << "U's exactTargetValue value: " << that->exactTargetValue << std::endl;
+            that->exactTargetValue = *updatedValue; // I had to add * here in addition to substituting the placeholder
+            std::cout << "U's exactTargetValue updated value: " << that->exactTargetValue << std::endl;
+            while( std::abs(that->adjustedValue - that->exactTargetValue) > 0.001f )
+            {
+                /*
+                 write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
+                 */
+                that->adjustedValue += 0.5f * (that->exactTargetValue - that->adjustedValue);
+            }
+            std::cout << "U's adjustedValue updated value: " << that->adjustedValue << std::endl;
         }
-        std::cout << "U's adjustedValue updated value: " << that->adjustedValue << std::endl;
         return that->adjustedValue * that->exactTargetValue;
     }
 };
