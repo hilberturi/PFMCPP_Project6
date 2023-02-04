@@ -84,8 +84,29 @@ struct U
     float exactTargetValue { 0 }, adjustedValue { 0 };
     float updateValuesAndMultiply(float* updatedValue)      //12
     {
-        // TODO: replace by actual implementation #############
-        return 0;
+        // Note: I could have replaced 'that' by 'this' here but I deciced to use
+        // plain member access without this->
+        // obviously a nullptr check for this is not necessary so I have deleted this
+        // check from the code that I copied from the static method.
+        
+        // check for nullptr as guided by 13)
+        if (updatedValue == nullptr)
+        {
+            std::cout << "U::updateValuesAndMultiply(): cannot update for nullptr" << std::endl;
+            return adjustedValue * exactTargetValue;
+        }
+        std::cout << "U's exactTargetValue value: " << exactTargetValue << std::endl;
+        exactTargetValue = *updatedValue;
+        std::cout << "U's exactTargetValue updated value: " << exactTargetValue << std::endl;
+        while( std::abs(adjustedValue - exactTargetValue) > 0.001f )
+        {
+            /*
+             write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
+             */
+            adjustedValue += 0.5f * (exactTargetValue - adjustedValue);
+        }
+        std::cout << "U's adjustedValue updated value: " << adjustedValue << std::endl;
+        return adjustedValue * exactTargetValue;
     }
 };
 
@@ -93,6 +114,20 @@ struct UValueUpdater
 {
     static float updateValuesAndMultiply(U* that, float* updatedValue )        //10
     {
+        // check for nullptr as guided by 13)
+        if (that == nullptr)
+        {
+             std::cout << "UValueUpdater::updateValuesAndMultiply(): unable to update for that==nullptr"   
+                          ", returning 0" 
+                       << std::endl;
+            return 0;
+        }
+        if (updatedValue == nullptr)
+        {
+            std::cout << "U::updateValuesAndMultiply(): cannot update for nullptr" << std::endl;
+            return that->adjustedValue * that->exactTargetValue;
+        }
+
         std::cout << "U's exactTargetValue value: " << that->exactTargetValue << std::endl;
         that->exactTargetValue = *updatedValue; // I had to add * here in addition to substituting the placeholder
         std::cout << "U's exactTargetValue updated value: " << that->exactTargetValue << std::endl;
@@ -101,7 +136,7 @@ struct UValueUpdater
             /*
              write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
              */
-            that->adjustedValue += ; // TODO#####################
+            that->adjustedValue += 0.5f * (that->exactTargetValue - that->adjustedValue);
         }
         std::cout << "U's adjustedValue updated value: " << that->adjustedValue << std::endl;
         return that->adjustedValue * that->exactTargetValue;
