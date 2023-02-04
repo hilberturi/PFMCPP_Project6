@@ -48,7 +48,7 @@ Purpose:  This project will show you the difference between member functions and
  11) call the <structName2> static function correctly in main()
  
  12) replicate the functionality of <structName2>'s static function by implementing a member function in U that does the same thing.
- 
+ #type 
  13) remember the rules for using pointers!  What is the one thing we always do before we use a pointer?
  
  After you finish, click the [run] button.  Clear up any errors or warnings as best you can.
@@ -58,12 +58,13 @@ Purpose:  This project will show you the difference between member functions and
 #include <string>
 struct T
 {
-    T(<#type name#> v, const char* <#variable name#>)   //1
-    //2
-    //3
+    T(int v, const char* namePtr)   //1
+        : value(v), name(namePtr) {}
+    int value; //2
+    std::string name; //3
 };
 
-struct <#structName1#>                                //4
+struct TComparator                                //4
 {
     <#type name#> compare(<#type name#> a, <#type name#> b) //5
     {
@@ -120,7 +121,7 @@ int main()
     T <#name1#>( , );                                             //6
     T <#name2#>( , );                                             //6
     
-    <#structName1#> f;                                            //7
+    TComparator f;                                            //7
     auto* smaller = f.compare( , );                              //8
     std::cout << "the smaller one is << " << smaller->name << std::endl; //9
     
