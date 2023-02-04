@@ -171,7 +171,7 @@ int main()
     }
     else 
     {
-        std::cout << "'f.compare()' returned nullptr (one arg is nullptr, or both args have same value)"
+        std::cout << "'f.compare()' returned nullptr (at least one arg is nullptr, or both args have same value)"
                   << std::endl;
     }
     
