@@ -36,14 +36,10 @@ struct T
 
 struct TPtrComparator                                //4
 {
-    T* compare(T* a, T* b) //5
+    const T* compare(const T& a, const T& b) //5
     {
-        // I will enforce safe pointer usage here as directed by 13)
-        if (a != nullptr && b != nullptr)
-        {
-            if( a->value < b->value ) return a;
-            if( a->value > b->value ) return b;
-        }
+        if( a.value < b.value ) return &a;
+        if( a.value > b.value ) return &b;        
         return nullptr;
     }
 };
@@ -51,67 +47,41 @@ struct TPtrComparator                                //4
 struct U
 {
     float exactTargetValue { 0 }, adjustedValue { 0 };
-    float updateValuesAndMultiply(float* updatedValue)      //12
-    {
-        // Note: I could have replaced 'that' by 'this' here but I deciced to use
-        // plain member access without this->
-        // obviously a nullptr check for this is not necessary so I have deleted this
-        // check from the code that I copied from the static method.
-        
-        // check for nullptr as guided by 13)
-        if (updatedValue == nullptr)
+    // I'll use a const ref for a primitive type rather than passing it by value as requested in Pt.2:
+    float updateValuesAndMultiply(const float& updatedValue)      //12
+    {       
+        std::cout << "U's exactTargetValue value: " << exactTargetValue << std::endl;
+        exactTargetValue = updatedValue;
+        std::cout << "U's exactTargetValue updated value: " << exactTargetValue << std::endl;
+        while( std::abs(adjustedValue - exactTargetValue) > 0.001f )
         {
-            std::cout << "U::updateValuesAndMultiply(): cannot update for nullptr" << std::endl;
+            /*
+             write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
+             */
+            adjustedValue += 0.5f * (exactTargetValue - adjustedValue);
         }
-        else
-        {
-            std::cout << "U's exactTargetValue value: " << exactTargetValue << std::endl;
-            exactTargetValue = *updatedValue;
-            std::cout << "U's exactTargetValue updated value: " << exactTargetValue << std::endl;
-            while( std::abs(adjustedValue - exactTargetValue) > 0.001f )
-            {
-                /*
-                 write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
-                 */
-                adjustedValue += 0.5f * (exactTargetValue - adjustedValue);
-            }
-            std::cout << "U's adjustedValue updated value: " << adjustedValue << std::endl;
-        }
-        return adjustedValue * exactTargetValue;
+        std::cout << "U's adjustedValue updated value: " << adjustedValue << std::endl;
+    return adjustedValue * exactTargetValue;
     }
 };
 
 struct UValueUpdater
 {
-    static float updateValuesAndMultiply(U* that, float* updatedValue )        //10
+    // I'll use a const ref for a primitive type rather than passing it by value as requested in Pt.2:
+    static float updateValuesAndMultiply(U& that, const float& updatedValue )        //10
     {
-        // check for nullptr as guided by 13)
-        if (that == nullptr)
+        std::cout << "U's exactTargetValue value: " << that.exactTargetValue << std::endl;
+        that.exactTargetValue = updatedValue; // I had to add * here in addition to substituting the placeholder
+        std::cout << "U's exactTargetValue updated value: " << that.exactTargetValue << std::endl;
+        while( std::abs(that.adjustedValue - that.exactTargetValue) > 0.001f )
         {
-             std::cout << "UValueUpdater::updateValuesAndMultiply(): unable to update for that==nullptr"   
-                          ", returning 0" 
-                       << std::endl;
-            return 0;
+            /*
+             write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
+             */
+            that.adjustedValue += 0.5f * (that.exactTargetValue - that.adjustedValue);
         }
-        if (updatedValue == nullptr)
-        {
-            std::cout << "U::updateValuesAndMultiply(): cannot update for nullptr" << std::endl;
-        }
-        else 
-        {
-            std::cout << "U's exactTargetValue value: " << that->exactTargetValue << std::endl;
-            that->exactTargetValue = *updatedValue; // I had to add * here in addition to substituting the placeholder
-            std::cout << "U's exactTargetValue updated value: " << that->exactTargetValue << std::endl;
-            while( std::abs(that->adjustedValue - that->exactTargetValue) > 0.001f )
-            {
-                /*
-                 write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
-                 */
-                that->adjustedValue += 0.5f * (that->exactTargetValue - that->adjustedValue);
-            }
-            std::cout << "U's adjustedValue updated value: " << that->adjustedValue << std::endl;
-        }
-        return that->adjustedValue * that->exactTargetValue;
+        std::cout << "U's adjustedValue updated value: " << that.adjustedValue << std::endl;
+        return that.adjustedValue * that.exactTargetValue;
     }
 };
         
@@ -135,21 +105,21 @@ int main()
     T t2(2 , "name2");                                             //6
     
     TPtrComparator f;                                            //7
-    auto* smaller = f.compare( &t1, &t2);                              //8
+    auto* smaller = f.compare (t1, t2);                              //8
     if (smaller != nullptr)
     {
         std::cout << "the smaller one is << " << smaller->name << std::endl; //9    
     }
     else 
     {
-        std::cout << "'f.compare()' returned nullptr (at least one arg is nullptr, or both args have same value)"
+        std::cout << "'f.compare()' returned nullptr (both args have same value)"
                   << std::endl;
     }
     
     U u1;
     float updatedValue = 5.f;
-    std::cout << "[static func] u1's multiplied values: " << UValueUpdater::updateValuesAndMultiply( &u1, &updatedValue) << std::endl;                  //11
+    std::cout << "[static func] u1's multiplied values: " << UValueUpdater::updateValuesAndMultiply (u1, updatedValue) << std::endl;                  //11
     
     U u2;
-    std::cout << "[member func] u2's multiplied values: " << u2.updateValuesAndMultiply( &updatedValue ) << std::endl;
+    std::cout << "[member func] u2's multiplied values: " << u2.updateValuesAndMultiply (updatedValue) << std::endl;
 }
