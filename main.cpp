@@ -58,46 +58,89 @@ Purpose:  This project will show you the difference between member functions and
 #include <string>
 struct T
 {
-    T(<#type name#> v, const char* <#variable name#>)   //1
-    //2
-    //3
+    T(int v, const char* theName) : value(v), name(theName) {}  //1 Note that I had to change the <#type name#> of the first arg to int rather than T*
+    int value; //2
+    std::string name; //3
 };
 
-struct <#structName1#>                                //4
+struct TPtrComparator                                //4
 {
-    <#type name#> compare(<#type name#> a, <#type name#> b) //5
+    T* compare(T* a, T* b) //5
     {
-        if( a->value < b->value ) return a;
-        if( a->value > b->value ) return b;
+        // I will enforce safe pointer usage here as directed by 13)
+        if (a != nullptr && b != nullptr)
+        {
+            if( a->value < b->value ) return a;
+            if( a->value > b->value ) return b;
+        }
         return nullptr;
     }
 };
 
 struct U
 {
-    float <#name1#> { 0 }, <#name2#> { 0 };
-    <#returnType#> <#memberFunction#>(<#type name#>* <#updatedValue#>)      //12
+    float exactTargetValue { 0 }, adjustedValue { 0 };
+    float updateValuesAndMultiply(float* updatedValue)      //12
     {
+        // Note: I could have replaced 'that' by 'this' here but I deciced to use
+        // plain member access without this->
+        // obviously a nullptr check for this is not necessary so I have deleted this
+        // check from the code that I copied from the static method.
         
+        // check for nullptr as guided by 13)
+        if (updatedValue == nullptr)
+        {
+            std::cout << "U::updateValuesAndMultiply(): cannot update for nullptr" << std::endl;
+        }
+        else
+        {
+            std::cout << "U's exactTargetValue value: " << exactTargetValue << std::endl;
+            exactTargetValue = *updatedValue;
+            std::cout << "U's exactTargetValue updated value: " << exactTargetValue << std::endl;
+            while( std::abs(adjustedValue - exactTargetValue) > 0.001f )
+            {
+                /*
+                 write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
+                 */
+                adjustedValue += 0.5f * (exactTargetValue - adjustedValue);
+            }
+            std::cout << "U's adjustedValue updated value: " << adjustedValue << std::endl;
+        }
+        return adjustedValue * exactTargetValue;
     }
 };
 
-struct <#structname2#>
+struct UValueUpdater
 {
-    static <#returntype#> <#staticFunctionA#>(U* that, <#type name#>* <#updatedValue#> )        //10
+    static float updateValuesAndMultiply(U* that, float* updatedValue )        //10
     {
-        std::cout << "U's <#name1#> value: " << that-><#name1#> << std::endl;
-        that-><#name1#> = <#updatedValue#>;
-        std::cout << "U's <#name1#> updated value: " << that-><#name1#> << std::endl;
-        while( std::abs(that-><#name2#> - that-><#name1#>) > 0.001f )
+        // check for nullptr as guided by 13)
+        if (that == nullptr)
         {
-            /*
-             write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
-             */
-            that-><#name2#> += ;
+             std::cout << "UValueUpdater::updateValuesAndMultiply(): unable to update for that==nullptr"   
+                          ", returning 0" 
+                       << std::endl;
+            return 0;
         }
-        std::cout << "U's <#name2#> updated value: " << that-><#name2#> << std::endl;
-        return that-><#name2#> * that-><#name1#>;
+        if (updatedValue == nullptr)
+        {
+            std::cout << "U::updateValuesAndMultiply(): cannot update for nullptr" << std::endl;
+        }
+        else 
+        {
+            std::cout << "U's exactTargetValue value: " << that->exactTargetValue << std::endl;
+            that->exactTargetValue = *updatedValue; // I had to add * here in addition to substituting the placeholder
+            std::cout << "U's exactTargetValue updated value: " << that->exactTargetValue << std::endl;
+            while( std::abs(that->adjustedValue - that->exactTargetValue) > 0.001f )
+            {
+                /*
+                 write something that makes the distance between that->adjustedValue and that->exactTargetValue get smaller
+                 */
+                that->adjustedValue += 0.5f * (that->exactTargetValue - that->adjustedValue);
+            }
+            std::cout << "U's adjustedValue updated value: " << that->adjustedValue << std::endl;
+        }
+        return that->adjustedValue * that->exactTargetValue;
     }
 };
         
@@ -117,17 +160,25 @@ struct <#structname2#>
 
 int main()
 {
-    T <#name1#>( , );                                             //6
-    T <#name2#>( , );                                             //6
+    T t1(1 , "name1");                                             //6
+    T t2(2 , "name2");                                             //6
     
-    <#structName1#> f;                                            //7
-    auto* smaller = f.compare( , );                              //8
-    std::cout << "the smaller one is << " << smaller->name << std::endl; //9
+    TPtrComparator f;                                            //7
+    auto* smaller = f.compare( &t1, &t2);                              //8
+    if (smaller != nullptr)
+    {
+        std::cout << "the smaller one is << " << smaller->name << std::endl; //9    
+    }
+    else 
+    {
+        std::cout << "'f.compare()' returned nullptr (at least one arg is nullptr, or both args have same value)"
+                  << std::endl;
+    }
     
-    U <#name3#>;
+    U u1;
     float updatedValue = 5.f;
-    std::cout << "[static func] <#name3#>'s multiplied values: " << <#structname2#>::<#staticFunctionA#>( , ) << std::endl;                  //11
+    std::cout << "[static func] u1's multiplied values: " << UValueUpdater::updateValuesAndMultiply( &u1, &updatedValue) << std::endl;                  //11
     
-    U <#name4#>;
-    std::cout << "[member func] <#name4#>'s multiplied values: " << <#name4#>.<#memberFunction#>( &updatedValue ) << std::endl;
+    U u2;
+    std::cout << "[member func] u2's multiplied values: " << u2.updateValuesAndMultiply( &updatedValue ) << std::endl;
 }
