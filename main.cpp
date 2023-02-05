@@ -105,7 +105,7 @@ struct U
                 adjustedValue += 0.5f * (exactTargetValue - adjustedValue);
             }
             std::cout << "U's adjustedValue updated value: " << adjustedValue << std::endl;
-            }
+        }
         return adjustedValue * exactTargetValue;
     }
 };
